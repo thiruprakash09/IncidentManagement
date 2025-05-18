@@ -1,0 +1,14 @@
+{
+    "sys_id": "i9j0k1l2m3n4o5p6q7r8",
+    "name": "Escalate",
+    "table": "incident",
+    "action_name": "escalate",
+    "client": false,
+    "form_button": true,
+    "form_link": false,
+    "order": 100,
+    "script": "/**\n * UI Action: Escalate\n * Table: incident\n * \n * Escalates the incident by updating priority, state, and assignment\n */\nfunction escalateIncident() {\n    // Update the current incident\n    current.state = 2; // In Progress\n    \n    // Only increase priority if it's not already at 1\n    if (current.priority > 1) {\n        var newPriority = parseInt(current.priority) - 1;\n        current.priority = newPriority;\n    }\n    \n    // Add a work note about the escalation\n    current.work_notes = gs.getMessage('Incident has been escalated by {0}. Priority set to {1}.', \n                                      [gs.getUserDisplayName(), current.priority.getDisplayValue()]);\n    \n    // Check if an escalation assignment group should be used\n    if (current.assignment_group) {\n        var escalationGroup = getEscalationGroup(current.assignment_group);\n        if (escalationGroup) {\n            current.assignment_group = escalationGroup;\n            current.assigned_to = ''; // Clear the assigned individual\n        }\n    }\n    \n    // Save the changes\n    current.update();\n    \n    // Redirect back to the incident\n    action.setRedirectURL(current);\n    return false;\n}\n\n/**\n * Get the appropriate escalation group for the current assignment group\n */\nfunction getEscalationGroup(groupId) {\n    // This could be configured via a table to map groups to their escalation groups\n    // For now, using a simple example\n    var escalationMap = {\n        // Format: current group sys_id : escalation group sys_id\n        'help_desk_group_id': 'tier2_support_id',\n        'network_group_id': 'network_escalation_id'\n    };\n    \n    // Check if we have a mapping\n    if (escalationMap.hasOwnProperty(groupId)) {\n        return escalationMap[groupId];\n    }\n    \n    // If no mapping is found, return the incident management group\n    var incidentMgmt = new GlideRecord('sys_user_group');\n    incidentMgmt.addQuery('name', 'Incident Management');\n    incidentMgmt.query();\n    \n    if (incidentMgmt.next()) {\n        return incidentMgmt.sys_id;\n    }\n    \n    return null;\n}\n\nescalateIncident();",
+    "condition": "!current.isNewRecord() && current.state != 7",
+    "condition_description": "Not new record and not closed",
+    "hint": "Escalates the incident, increases priority, and moves to appropriate escalation group"
+}

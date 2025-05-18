@@ -1,0 +1,9 @@
+{
+    "sys_id": "f6g7h8i9j0k1l2m3n4o5",
+    "name": "Warn on Urgent in Description",
+    "table": "incident",
+    "field_name": "short_description",
+    "script_type": "onChange",
+    "description": "Shows a warning message if the short description contains the word 'urgent'",
+    "script": "/**\n * Client Script: Warn on Urgent in Description\n * Table: incident\n * Field: short_description\n * Type: onChange\n * \n * Shows a warning message if the short description contains the word 'urgent'\n */\nfunction onChange(control, oldValue, newValue, isLoading) {\n    if (isLoading || newValue == '') {\n        return;\n    }\n    \n    // Clear any existing messages\n    g_form.hideFieldMsg('short_description');\n    \n    // Check if the description contains 'urgent' (case insensitive)\n    var urgentPattern = /urgent/i;\n    if (urgentPattern.test(newValue)) {\n        // Show warning message\n        g_form.showFieldMsg('short_description', \n            'The keyword \"urgent\" was detected. Please consider setting appropriate Priority and Urgency values instead of using this keyword.',\n            'warning');\n        \n        // Suggest setting priority if not already set\n        if (!g_form.getValue('priority') || g_form.getValue('priority') > 2) {\n            g_form.addInfoMessage('Consider setting Priority to a higher value for urgent incidents');\n        }\n    }\n}"
+}

@@ -1,0 +1,157 @@
+# Node.js dependencies and artifacts
+node_modules/
+npm-debug.log
+npm-error.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.pem
+auth.json
+credentials.json
+
+# Editor directories and files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.default
+!.vscode/launch.json.default
+!.vscode/tasks.json.default
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.history/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build output and artifacts
+/dist
+/build
+/tmp
+/out
+/target
+.webpack/
+.eslintcache
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# CI/CD related files
+.azure/
+.azure-pipelines/
+.azuredevops/credentials/
+.azuredevops/pipelines/.tmp/
+.azuredevops/pipelines/cache/
+azuredevops.workload.settings.json
+
+# Build and test artifacts
+coverage/
+test-results/
+junit.xml
+test-report.xml
+__mocks__/.cache
+__test__/.cache
+.scannerwork/
+servicenow-app-*.zip
+deployment-package/
+
+# Local Azure DevOps artifacts
+.deployment/
+.build/
+.azp/
+.testresults/
+BuildResults/
+pipeline-artifacts/
+
+# ServiceNow specific
+update_set_*.xml
+update_set_*.json
+*.update.xml
+/sys_update_sets/
+/applications/
+/update_sets/
+/scoped_apps/
+/updatesets/
+servicenow-*.zip
+servicenow-*.xml
+.sn-sync/
+.sn-config.json
+/sn-tools/
+sn-api-token.json
+snow_auth.json
+servicenow-creds.json
+snc_*.json
+
+# Testing and coverage artifacts
+/coverage
+.nyc_output
+junit.xml
+test-results.xml
+cypress/videos/
+cypress/screenshots/
+/mochawesome-report
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+.tmp/
+*.bak
+*.backup
+*.old
+
+# Cache directories
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusion/
+
+# Documentation generated files
+/docs/_build/
+/docs/api/
+/docs/_site/
+/site/
+/apidoc/
+
+# Miscellaneous
+.sass-cache/
+.project
+.classpath
+.c9/
+*.launch
+*.tgz
+.tern-port
+.dynamodb/
+.grunt
+.lock-wscript

@@ -1,0 +1,68 @@
+{
+  "id": "com.servicenow.incident_management",
+  "version": "1.0.0",
+  "name": "Incident Management",
+  "description": "Custom incident management implementation with enhanced workflow and automation",
+  "author": "Incident Management Team",
+  "files": [
+    {
+      "path": "src/BusinessRules/*.json",
+      "table": "sys_script",
+      "type": "business_rule"
+    },
+    {
+      "path": "src/ClientScripts/*.json",
+      "table": "sys_script_client",
+      "type": "client_script"
+    },
+    {
+      "path": "src/UIActions/*.json",
+      "table": "sys_ui_action",
+      "type": "ui_action"
+    },
+    {
+      "path": "src/ScriptIncludes/*.json",
+      "table": "sys_script_include",
+      "type": "script_include"
+    },
+    {
+      "path": "src/UIPolicy/*.json",
+      "table": "sys_ui_policy",
+      "type": "ui_policy"
+    },
+    {
+      "path": "src/Notifications/*.json",
+      "table": "sysevent_email_template",
+      "type": "notification"
+    },
+    {
+      "path": "src/ScheduledJobs/*.json",
+      "table": "sysauto_script",
+      "type": "scheduled_script"
+    },
+    {
+      "path": "src/FlowDesigner/*.json",
+      "table": "sys_hub_flow",
+      "type": "flow_designer"
+    },
+    {
+      "path": "src/ATF/*.json",
+      "table": "sys_atf_test",
+      "type": "atf_test"
+    },
+    {
+      "path": "src/TableConfig/*.json",
+      "table": "sys_dictionary",
+      "type": "table_config"
+    }
+  ],
+  "dependencies": {
+    "incident": "global"
+  },
+  "azure_devops": {
+    "org": "${AZURE_DEVOPS_ORG}",
+    "project": "${AZURE_DEVOPS_PROJECT}",
+    "pipeline_id": "${AZURE_DEVOPS_PIPELINE_ID}",
+    "connection_id": "${SERVICENOW_CONNECTION_ID}"
+  }
+}

@@ -1,0 +1,93 @@
+# ServiceNow Incident Management CI/CD Pipeline
+# This is the main entry point for the Azure DevOps pipeline
+
+trigger:
+  branches:
+    include:
+    - main
+    - development
+  paths:
+    include:
+    - src/**
+    - scripts/**
+    - package.json
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: 'Build and Validate'
+  jobs:
+  - job: Validate
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '14.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm install
+      displayName: 'Install dependencies'
+    
+    - script: |
+        npm run lint
+      displayName: 'Lint JavaScript files'
+      
+    - script: |
+        npm run validate
+      displayName: 'Validate ServiceNow files'
+
+- stage: Test
+  displayName: 'Run Tests'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: RunTests
+    steps:
+    - template: .azuredevops/pipelines/ci-pipeline.yml
+
+- stage: DeployToDev
+  displayName: 'Deploy to Development'
+  dependsOn: Test
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/development'))
+  jobs:
+  - deployment: DeployToDev
+    environment: 'Development'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: .azuredevops/pipelines/cd-pipeline.yml
+            parameters:
+              environment: 'dev'
+
+- stage: DeployToTest
+  displayName: 'Deploy to Test'
+  dependsOn: DeployToDev
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployToTest
+    environment: 'Test'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: .azuredevops/pipelines/cd-pipeline.yml
+            parameters:
+              environment: 'test'
+
+- stage: DeployToProd
+  displayName: 'Deploy to Production'
+  dependsOn: DeployToTest
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployToProd
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: .azuredevops/pipelines/cd-pipeline.yml
+            parameters:
+              environment: 'prod'

@@ -1,0 +1,89 @@
+{
+    "flow_name": "Pause Incident Until Impact Filled",
+    "flow_description": "Pauses incident workflow until the Impact field is filled",
+    "trigger": {
+        "type": "record_updated",
+        "table": "incident",
+        "when": "after",
+        "filter_conditions": {
+            "priority": "1",
+            "impact": "is empty"
+        }
+    },
+    "actions": [
+        {
+            "name": "Create Approval Request",
+            "type": "create_record",
+            "table": "sysapproval_approver",
+            "values": {
+                "document_id": "${trigger.sys_id}",
+                "sysapproval": "${trigger.sys_id}",
+                "approver": "${trigger.caller_id}",
+                "state": "requested",
+                "comments": "Please provide the impact level for this Priority 1 incident. Workflow is paused until impact is specified."
+            },
+            "output_variables": {
+                "approval_id": "sys_id"
+            }
+        },
+        {
+            "name": "Update Incident",
+            "type": "update_record",
+            "table": "incident",
+            "record_id": "${trigger.sys_id}",
+            "values": {
+                "work_notes": "Workflow paused: Impact field must be specified for Priority 1 incidents. An approval has been sent to the caller.",
+                "approval": "${Create Approval Request.approval_id}"
+            }
+        },
+        {
+            "name": "Wait For Impact",
+            "type": "wait_for_condition",
+            "table": "incident",
+            "record_id": "${trigger.sys_id}",
+            "condition": {
+                "impact": "is not empty"
+            },
+            "timeout_seconds": 86400,
+            "timeout_description": "24 hours"
+        },
+        {
+            "name": "Check Approval Status",
+            "type": "look_up_record",
+            "table": "sysapproval_approver",
+            "conditions": {
+                "sys_id": "${Create Approval Request.approval_id}"
+            },
+            "output_variables": {
+                "approval_state": "state"
+            }
+        },
+        {
+            "name": "Complete Approval",
+            "type": "update_record",
+            "table": "sysapproval_approver",
+            "record_id": "${Create Approval Request.approval_id}",
+            "values": {
+                "state": "approved",
+                "comments": "Impact field has been filled. Automatically approving."
+            },
+            "conditions": {
+                "when": "${Check Approval Status.approval_state == 'requested'}"
+            }
+        },
+        {
+            "name": "Log Flow Completion",
+            "type": "log_message",
+            "message": "Impact field for incident ${trigger.number} has been filled. Workflow resumed."
+        },
+        {
+            "name": "Handle Timeout",
+            "type": "script",
+            "script": "/**\n * Flow Designer Script: Handle Timeout for Impact Field\n * \n * Handles the case when the impact field isn't filled within the timeout period\n */\n(function execute(inputs, outputs) {\n    // Check if we're in a timeout situation\n    if (inputs.timeout) {\n        // Set a default impact value\n        var gr = new GlideRecord('incident');\n        if (gr.get(inputs.incident_id)) {\n            // Still no impact value after timeout\n            if (!gr.impact.nil()) {\n                outputs.result = 'Impact already set, no action needed';\n                return;\n            }\n            \n            // Set default impact to High (1) for Priority 1 incidents\n            gr.impact = 1;\n            gr.work_notes = 'Impact automatically set to High after timeout period';\n            \n            if (gr.update()) {\n                outputs.result = 'Successfully set default impact';\n            } else {\n                outputs.result = 'Failed to set default impact';\n            }\n        } else {\n            outputs.result = 'Could not find incident record';\n        }\n    } else {\n        outputs.result = 'Not in timeout state';\n    }\n})(inputs, outputs);",
+            "script_variables": {
+                "incident_id": "${trigger.sys_id}",
+                "timeout": "${Wait For Impact.timeout}"
+            }
+        }
+    ]
+}

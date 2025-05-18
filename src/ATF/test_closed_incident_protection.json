@@ -1,0 +1,72 @@
+{
+    "sys_id": "p6q7r8s9t0u1v2w3x4y5",
+    "name": "Test Closed Incident Updates",
+    "description": "Tests that closed incidents cannot be reopened through the UI",
+    "test_steps": [
+        {
+            "order": 100,
+            "step_type": "record_create",
+            "table": "incident",
+            "values": {
+                "short_description": "Test closed incident protection",
+                "category": "software",
+                "description": "This is a test to verify closed incident protection"
+            },
+            "expected_results": "Successfully created incident record"
+        },
+        {
+            "order": 200,
+            "step_type": "record_update",
+            "values": {
+                "state": "7",
+                "close_code": "Solved (Permanently)",
+                "close_notes": "Closing for test purposes"
+            },
+            "expected_results": "Successfully closed the incident"
+        },
+        {
+            "order": 300,
+            "step_type": "record_update",
+            "values": {
+                "state": "2",
+                "work_notes": "Attempting to reopen"
+            },
+            "expected_results": "Update should be blocked",
+            "expected_exception": true
+        },
+        {
+            "order": 400,
+            "step_type": "ui_form_action",
+            "form_action": "Reopen",
+            "expected_results": "Action should be disabled or blocked",
+            "expected_exception": true
+        },
+        {
+            "order": 500,
+            "step_type": "assertion_form_field_value",
+            "field": "state",
+            "expected_value": "7",
+            "expected_results": "State should remain Closed"
+        },
+        {
+            "order": 600,
+            "step_type": "impersonate_user",
+            "user": "admin",
+            "expected_results": "Successfully impersonated admin user"
+        },
+        {
+            "order": 700,
+            "step_type": "record_update",
+            "values": {
+                "state": "2",
+                "work_notes": "Reopening as admin"
+            },
+            "expected_results": "Admin should be able to update closed incident"
+        },
+        {
+            "order": 800,
+            "step_type": "record_delete",
+            "expected_results": "Successfully deleted test incident"
+        }
+    ]
+}

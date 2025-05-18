@@ -1,0 +1,18 @@
+{
+    "sys_id": "h8i9j0k1l2m3n4o5p6q7",
+    "name": "Make Assigned To Read-Only When Closed",
+    "table": "incident",
+    "short_description": "Makes the Assigned to field read-only if the state is Closed",
+    "conditions": "state == 7",
+    "reverse_if_false": true,
+    "actions": [
+        {
+            "field": "assigned_to",
+            "visible": true,
+            "mandatory": false,
+            "read_only": true
+        }
+    ],
+    "script_true": "",
+    "script_false": ""
+}

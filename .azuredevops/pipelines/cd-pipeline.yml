@@ -1,0 +1,57 @@
+# ServiceNow Incident Management CD Pipeline
+# This template defines the deployment steps for the ServiceNow components
+
+parameters:
+  - name: environment
+    type: string
+    default: 'dev'
+    values:
+      - 'dev'
+      - 'test'
+      - 'prod'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+  displayName: 'Install dependencies'
+
+- script: |
+    # Generate deployment package
+    mkdir -p $(Build.ArtifactStagingDirectory)/deployment
+    cp -r src/* $(Build.ArtifactStagingDirectory)/deployment/
+    cp -r scripts/* $(Build.ArtifactStagingDirectory)/deployment/
+    echo "Generated deployment package for ${{ parameters.environment }}"
+  displayName: 'Prepare deployment package'
+
+- script: |
+    # Run the deploy script with the environment parameter
+    node scripts/deploy.js ${{ parameters.environment }}
+  displayName: 'Run node deploy script'
+  env:
+    SN_DEV_INSTANCE: $(servicenow.dev.instance)
+    SN_DEV_USERNAME: $(servicenow.dev.username)
+    SN_DEV_PASSWORD: $(servicenow.dev.password)
+    SN_TEST_INSTANCE: $(servicenow.test.instance)
+    SN_TEST_USERNAME: $(servicenow.test.username)
+    SN_TEST_PASSWORD: $(servicenow.test.password)
+    SN_PROD_INSTANCE: $(servicenow.prod.instance)
+    SN_PROD_USERNAME: $(servicenow.prod.username)
+    SN_PROD_PASSWORD: $(servicenow.prod.password)
+
+- task: ServiceNowDevOpsDeploy@1
+  displayName: 'Deploy to ServiceNow ${{ parameters.environment }}'
+  inputs:
+    connectedServiceName: 'ServiceNow-Connection'
+    instanceName: $(servicenow.${{ parameters.environment }}.instance)
+    applicationName: 'IncidentManagement'
+    deploymentType: 'Standard Change'
+    changeSetName: 'IncidentManagement-$(Build.BuildNumber)'
+    deploymentPackagePath: '$(Build.ArtifactStagingDirectory)/deployment/'
+    exportConfigFromInstance: false
+    appVersion: '$(Build.BuildNumber)'
+    deploymentNotes: 'Deployment from Azure DevOps Pipeline. Build: $(Build.BuildNumber), Commit: $(Build.SourceVersion)'

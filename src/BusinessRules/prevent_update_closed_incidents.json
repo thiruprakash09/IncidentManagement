@@ -1,0 +1,10 @@
+{
+    "sys_id": "b2c3d4e5f6g7h8i9j0k1",
+    "name": "Prevent Update of Closed Incidents",
+    "collection": "incident",
+    "when": "before",
+    "operation": "update",
+    "order": 100,
+    "description": "Prevents updating an incident if it is already in 'Closed' state",
+    "script": "/**\n * Business Rule: Prevent Update of Closed Incidents\n * Table: incident\n * When: before\n * Operation: update\n * \n * Prevents updating an incident if it is already in 'Closed' state\n */\n(function executeRule(current, previous /*null when async*/) {\n\n    // Check if the incident is in Closed state (value 7)\n    if (previous.state == 7) {\n        // Allow updates by specific roles or for specific fields\n        var user = gs.getUser();\n        var allowedRoles = ['admin', 'incident_manager'];\n        var hasAllowedRole = false;\n        \n        // Check if the user has any of the allowed roles\n        for (var i = 0; i < allowedRoles.length; i++) {\n            if (user.hasRole(allowedRoles[i])) {\n                hasAllowedRole = true;\n                break;\n            }\n        }\n        \n        // Allow specific fields to be updated even in closed state\n        var allowedFields = ['comments', 'close_notes', 'close_code'];\n        var onlyChangingAllowedFields = true;\n        \n        // Check changed fields\n        for (var fieldName in current.getChangedFields()) {\n            if (allowedFields.indexOf(fieldName) === -1) {\n                onlyChangingAllowedFields = false;\n                break;\n            }\n        }\n        \n        // If the user doesn't have an allowed role and is changing disallowed fields\n        if (!hasAllowedRole && !onlyChangingAllowedFields) {\n            gs.addErrorMessage('Incident cannot be modified because it is in Closed state. Please reopen the incident first or contact an Incident Manager.');\n            current.setAbortAction(true);\n        }\n    }\n\n})(current, previous);"
+}

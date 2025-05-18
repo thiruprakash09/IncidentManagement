@@ -1,0 +1,14 @@
+{
+    "sys_id": "j0k1l2m3n4o5p6q7r8s9",
+    "name": "Reassign to Caller's Manager",
+    "table": "incident",
+    "action_name": "reassign_to_manager",
+    "client": false,
+    "form_button": true,
+    "form_link": false,
+    "order": 110,
+    "script": "/**\n * UI Action: Reassign to Caller's Manager\n * Table: incident\n * \n * Reassigns the incident to the caller's manager\n */\nfunction reassignToCallersManager() {\n    // Only proceed if we have a caller\n    if (!current.caller_id) {\n        gs.addErrorMessage('Cannot reassign: No caller is specified for this incident');\n        action.setRedirectURL(current);\n        return false;\n    }\n    \n    // Look up the caller's manager\n    var caller = new GlideRecord('sys_user');\n    if (caller.get(current.caller_id)) {\n        // Check if the caller has a manager\n        if (caller.manager) {\n            // Update the incident assignment\n            current.assigned_to = caller.manager;\n            \n            // Add work notes\n            current.work_notes = gs.getMessage('Incident reassigned to caller\\'s manager: {0}', \n                                          [caller.manager.getDisplayValue()]);\n            \n            // Save the changes\n            current.update();\n            \n            gs.addInfoMessage('Incident reassigned to ' + caller.manager.getDisplayValue());\n        } else {\n            gs.addErrorMessage('Cannot reassign: The caller does not have a manager assigned');\n        }\n    } else {\n        gs.addErrorMessage('Cannot reassign: Unable to retrieve caller information');\n    }\n    \n    // Redirect back to the incident\n    action.setRedirectURL(current);\n    return false;\n}\n\nreassignToCallersManager();",
+    "condition": "!current.isNewRecord() && current.caller_id",
+    "condition_description": "Not new record and has a caller",
+    "hint": "Reassigns this incident to the caller's manager"
+}

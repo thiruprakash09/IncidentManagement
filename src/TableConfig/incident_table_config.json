@@ -1,0 +1,271 @@
+{
+    "table": {
+        "name": "incident",
+        "label": "Incident",
+        "plural": "Incidents",
+        "extends": "task",
+        "access": "public"
+    },
+    "fields": [
+        {
+            "name": "number",
+            "type": "string",
+            "label": "Number",
+            "max_length": 40,
+            "display": true,
+            "read_only": true,
+            "mandatory": false,
+            "default_value": ""
+        },
+        {
+            "name": "short_description",
+            "type": "string",
+            "label": "Short description",
+            "max_length": 160,
+            "display": true,
+            "read_only": false,
+            "mandatory": true,
+            "default_value": ""
+        },
+        {
+            "name": "description",
+            "type": "journal",
+            "label": "Description",
+            "display": true,
+            "read_only": false,
+            "mandatory": false
+        },
+        {
+            "name": "state",
+            "type": "integer",
+            "label": "State",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "default_value": "1",
+            "choices": [
+                {
+                    "label": "New",
+                    "value": "1"
+                },
+                {
+                    "label": "In Progress",
+                    "value": "2"
+                },
+                {
+                    "label": "On Hold",
+                    "value": "3"
+                },
+                {
+                    "label": "Resolved",
+                    "value": "6"
+                },
+                {
+                    "label": "Closed",
+                    "value": "7"
+                },
+                {
+                    "label": "Canceled",
+                    "value": "8"
+                }
+            ]
+        },
+        {
+            "name": "impact",
+            "type": "integer",
+            "label": "Impact",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "default_value": "3",
+            "choices": [
+                {
+                    "label": "High",
+                    "value": "1"
+                },
+                {
+                    "label": "Medium",
+                    "value": "2"
+                },
+                {
+                    "label": "Low",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "urgency",
+            "type": "integer",
+            "label": "Urgency",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "default_value": "3",
+            "choices": [
+                {
+                    "label": "High",
+                    "value": "1"
+                },
+                {
+                    "label": "Medium",
+                    "value": "2"
+                },
+                {
+                    "label": "Low",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "priority",
+            "type": "integer",
+            "label": "Priority",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "default_value": "3",
+            "choices": [
+                {
+                    "label": "Critical",
+                    "value": "1"
+                },
+                {
+                    "label": "High",
+                    "value": "2"
+                },
+                {
+                    "label": "Moderate",
+                    "value": "3"
+                },
+                {
+                    "label": "Low",
+                    "value": "4"
+                },
+                {
+                    "label": "Planning",
+                    "value": "5"
+                }
+            ]
+        },
+        {
+            "name": "category",
+            "type": "string",
+            "label": "Category",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "default_value": "",
+            "max_length": 40,
+            "reference_table": "incident_category"
+        },
+        {
+            "name": "subcategory",
+            "type": "string",
+            "label": "Subcategory",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "default_value": "",
+            "max_length": 40,
+            "reference_table": "incident_subcategory"
+        },
+        {
+            "name": "assignment_group",
+            "type": "reference",
+            "label": "Assignment group",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "reference_table": "sys_user_group"
+        },
+        {
+            "name": "assigned_to",
+            "type": "reference",
+            "label": "Assigned to",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "reference_table": "sys_user"
+        },
+        {
+            "name": "caller_id",
+            "type": "reference",
+            "label": "Caller",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "reference_table": "sys_user"
+        },
+        {
+            "name": "close_code",
+            "type": "string",
+            "label": "Close code",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "max_length": 40,
+            "choices": [
+                {
+                    "label": "Solved (Permanently)",
+                    "value": "Solved (Permanently)"
+                },
+                {
+                    "label": "Solved (Workaround)",
+                    "value": "Solved (Workaround)"
+                },
+                {
+                    "label": "Not Solved (Not Reproducible)",
+                    "value": "Not Solved (Not Reproducible)"
+                },
+                {
+                    "label": "Not Solved (Too Costly)",
+                    "value": "Not Solved (Too Costly)"
+                },
+                {
+                    "label": "Closed/Resolved by Caller",
+                    "value": "Closed/Resolved by Caller"
+                }
+            ]
+        },
+        {
+            "name": "close_notes",
+            "type": "string",
+            "label": "Close notes",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "max_length": 4000
+        },
+        {
+            "name": "cmdb_ci",
+            "type": "reference",
+            "label": "Configuration item",
+            "display": true,
+            "read_only": false,
+            "mandatory": false,
+            "reference_table": "cmdb_ci"
+        },
+        {
+            "name": "sla_due",
+            "type": "glide_datetime",
+            "label": "SLA due",
+            "display": true,
+            "read_only": true,
+            "mandatory": false
+        }
+    ],
+    "dictionary_overrides": [
+        {
+            "field": "short_description",
+            "column_label": "Issue Summary",
+            "mandatory": true,
+            "help_text": "Brief summary of the issue. Please be descriptive but concise."
+        },
+        {
+            "field": "priority",
+            "column_label": "Priority",
+            "mandatory": true,
+            "help_text": "Calculated from Impact and Urgency by default. Can be manually overridden."
+        }
+    ]
+}

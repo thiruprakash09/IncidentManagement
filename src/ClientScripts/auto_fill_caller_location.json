@@ -1,0 +1,9 @@
+{
+    "sys_id": "e5f6g7h8i9j0k1l2m3n4",
+    "name": "Auto Fill Caller Location",
+    "table": "incident",
+    "field_name": "caller_id",
+    "script_type": "onChange",
+    "description": "Automatically fills the caller's location when a caller is selected",
+    "script": "/**\n * Client Script: Auto Fill Caller Location\n * Table: incident\n * Field: caller_id\n * Type: onChange\n * \n * Automatically fills the caller's location when a caller is selected\n */\nfunction onChange(control, oldValue, newValue, isLoading) {\n    if (isLoading || newValue == '') {\n        return;\n    }\n    \n    // Clear previous location if caller is cleared\n    if (newValue == '') {\n        g_form.setValue('location', '');\n        return;\n    }\n    \n    // If location is already filled and we're not overriding\n    var currentLocation = g_form.getValue('location');\n    if (currentLocation && !confirm('Do you want to update the location based on the caller?')) {\n        return;\n    }\n    \n    // Make an async call to get the caller's location\n    var ga = new GlideAjax('IncidentCallerUtils');\n    ga.addParam('sysparm_name', 'getCallerLocation');\n    ga.addParam('sysparm_user_id', newValue);\n    ga.getXML(function(response) {\n        var answer = response.responseXML.documentElement.getAttribute('answer');\n        if (answer && answer != 'null') {\n            // Set the location on the form\n            g_form.setValue('location', answer);\n            \n            // Show a confirmation message\n            var locationDisplay = g_form.getDisplayBox('location').value;\n            g_form.addInfoMessage('Location automatically set to: ' + locationDisplay);\n        }\n    });\n}"
+}

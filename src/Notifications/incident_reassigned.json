@@ -1,0 +1,11 @@
+{
+    "sys_id": "k1l2m3n4o5p6q7r8s9t0",
+    "name": "Incident Reassigned",
+    "table": "incident",
+    "condition": "current.assigned_to.changes() || current.assignment_group.changes()",
+    "recipients": "${current.assigned_to}",
+    "recipientList": "",
+    "from": "${system.email}",
+    "subject": "Incident ${current.number} has been assigned to you",
+    "body": "<p>Hello ${current.assigned_to.name},</p>\n\n<p>Incident <strong>${current.number}</strong> has been assigned to you.</p>\n\n<h3>Incident Details</h3>\n<table>\n  <tr>\n    <td><strong>Number:</strong></td>\n    <td>${current.number}</td>\n  </tr>\n  <tr>\n    <td><strong>Priority:</strong></td>\n    <td>${current.priority}</td>\n  </tr>\n  <tr>\n    <td><strong>State:</strong></td>\n    <td>${current.state}</td>\n  </tr>\n  <tr>\n    <td><strong>Short Description:</strong></td>\n    <td>${current.short_description}</td>\n  </tr>\n  <tr>\n    <td><strong>Assigned By:</strong></td>\n    <td>${gs.getUserDisplayName()}</td>\n  </tr>\n</table>\n\n<p>You can view the full incident details at:</p>\n<p><a href=\"${url}\">${url}</a></p>\n\n<p>Thank you,<br />\nServiceNow Incident Management</p>"
+}

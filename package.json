@@ -1,0 +1,39 @@
+{
+  "name": "servicenow-incident-management",
+  "version": "1.0.0",
+  "description": "ServiceNow Incident Management implementation with Config-as-Code approach",
+  "main": "index.js",  "scripts": {
+    "test": "jest",
+    "lint": "eslint \"src/**/*.js\"",
+    "validate": "node scripts/validate-sn-files.js",
+    "deploy:dev": "node scripts/deploy.js dev",
+    "deploy:test": "node scripts/deploy.js test",
+    "deploy:prod": "node scripts/deploy.js prod"
+  },
+  "keywords": [
+    "servicenow",
+    "incident",
+    "itsm",
+    "configuration",
+    "management"
+  ],
+  "author": "Incident Management Team",
+  "license": "MIT",  "devDependencies": {
+    "@servicenow/cli": "^23.0.0",
+    "eslint": "^8.45.0",
+    "prettier": "^3.0.0",
+    "jest": "^29.5.0",
+    "@servicenow/devops-azp": "^1.2.0"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/servicenow-incident-management.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

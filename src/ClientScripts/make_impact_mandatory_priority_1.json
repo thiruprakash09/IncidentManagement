@@ -1,0 +1,9 @@
+{
+    "sys_id": "d4e5f6g7h8i9j0k1l2m3",
+    "name": "Make Impact Mandatory for Priority 1",
+    "table": "incident",
+    "field_name": "priority",
+    "script_type": "onChange",
+    "description": "Makes the impact field mandatory when priority is set to 1",
+    "script": "/**\n * Client Script: Make Impact Mandatory for Priority 1\n * Table: incident\n * Field: priority\n * Type: onChange\n * \n * Makes the impact field mandatory when priority is set to 1\n */\nfunction onChange(control, oldValue, newValue, isLoading) {\n    if (isLoading || newValue == oldValue) {\n        return;\n    }\n    \n    // Get the form elements\n    var impactField = g_form.getElement('impact');\n    var impactControl = g_form.getControl('impact');\n    \n    // If the new priority value is 1 (Critical)\n    if (newValue == 1) {\n        // Make the impact field mandatory\n        g_form.setMandatory('impact', true);\n        \n        // Add a visual indicator to the field\n        if (impactControl) {\n            impactControl.addClassName('impact-high-priority');\n        }\n        \n        // If impact is empty, show a message\n        if (!g_form.getValue('impact')) {\n            g_form.showFieldMsg('impact', 'Impact must be specified for Priority 1 incidents', 'info');\n        }\n    } else {\n        // Reset to default behavior for other priority values\n        g_form.setMandatory('impact', false);\n        \n        // Remove the visual indicator\n        if (impactControl) {\n            impactControl.removeClassName('impact-high-priority');\n        }\n        \n        // Clear any messages\n        g_form.hideFieldMsg('impact');\n    }\n}"
+}

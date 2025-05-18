@@ -1,0 +1,54 @@
+{
+    "sys_id": "o5p6q7r8s9t0u1v2w3x4",
+    "name": "Incident Auto Assignment Test",
+    "description": "Tests that incidents are automatically assigned to the correct group based on category",
+    "test_steps": [
+        {
+            "order": 100,
+            "step_type": "record_create",
+            "table": "incident",
+            "values": {
+                "short_description": "Test auto assignment",
+                "category": "hardware",
+                "description": "This is a test to verify auto-assignment"
+            },
+            "expected_results": "Successfully created incident record"
+        },
+        {
+            "order": 200,
+            "step_type": "record_query",
+            "table": "incident",
+            "conditions": "short_description=Test auto assignment^category=hardware",
+            "expected_results": "Successfully retrieved incident record"
+        },
+        {
+            "order": 300,
+            "step_type": "assertion_field_values",
+            "field_values": {
+                "assignment_group": "Hardware Support"
+            },
+            "expected_results": "Incident is assigned to Hardware Support group"
+        },
+        {
+            "order": 400,
+            "step_type": "record_update",
+            "values": {
+                "category": "network"
+            },
+            "expected_results": "Successfully updated the incident category"
+        },
+        {
+            "order": 500,
+            "step_type": "assertion_field_values",
+            "field_values": {
+                "assignment_group": "Network Support"
+            },
+            "expected_results": "Incident assignment group was updated to Network Support"
+        },
+        {
+            "order": 600,
+            "step_type": "record_delete",
+            "expected_results": "Successfully deleted test incident"
+        }
+    ]
+}

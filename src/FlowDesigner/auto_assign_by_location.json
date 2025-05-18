@@ -1,0 +1,49 @@
+{
+    "flow_name": "Auto Assign Incident by Location",
+    "flow_description": "Automatically assigns incidents based on the user's location",
+    "trigger": {
+        "type": "record_created",
+        "table": "incident",
+        "when": "after",
+        "filter_conditions": {
+            "assignment_group": "is empty"
+        }
+    },
+    "actions": [
+        {
+            "name": "Get Caller Location",
+            "type": "look_up_record",
+            "table": "sys_user",
+            "conditions": {
+                "sys_id": "${trigger.current.caller_id}"
+            },
+            "output_variables": {
+                "caller_location": "location",
+                "caller_name": "name"
+            }
+        },
+        {
+            "name": "Find Assignment Group by Location",
+            "type": "script",
+            "script": "/**\n * Flow Designer Script: Find Assignment Group by Location\n * \n * Determines the appropriate assignment group based on the caller's location\n */\n(function execute(inputs, outputs) {\n    // Initialize outputs\n    outputs.group_id = '';\n    outputs.group_name = '';\n    \n    // Get inputs\n    var locationId = inputs.caller_location;\n    \n    // If no location, exit early\n    if (!locationId) {\n        outputs.result = 'No location found for caller';\n        return;\n    }\n    \n    // First check if we have a direct location to group mapping\n    var locationMap = {\n        // This could be loaded from a custom table instead of hardcoded\n        'New York': 'NY Support',\n        'Chicago': 'Chicago IT',\n        'San Francisco': 'SF Tech Support',\n        'London': 'EMEA Support',\n        'Singapore': 'APAC Support'\n    };\n    \n    // Get the location name\n    var locGR = new GlideRecord('cmn_location');\n    if (locGR.get(locationId)) {\n        var locationName = locGR.name.toString();\n        \n        // Check if we have a mapping for this location\n        for (var loc in locationMap) {\n            if (locationName.indexOf(loc) > -1) {\n                // Look up the group ID\n                var grpGR = new GlideRecord('sys_user_group');\n                grpGR.addQuery('name', locationMap[loc]);\n                grpGR.query();\n                \n                if (grpGR.next()) {\n                    outputs.group_id = grpGR.sys_id.toString();\n                    outputs.group_name = grpGR.name.toString();\n                    outputs.result = 'Found group for location: ' + locationName;\n                    return;\n                }\n            }\n        }\n        \n        // If we get here, no specific mapping was found\n        // Check if the location has a support group defined\n        if (locGR.getValue('support_group')) {\n            outputs.group_id = locGR.getValue('support_group');\n            var supportGR = new GlideRecord('sys_user_group');\n            if (supportGR.get(outputs.group_id)) {\n                outputs.group_name = supportGR.name.toString();\n                outputs.result = 'Found location support group';\n                return;\n            }\n        }\n    }\n    \n    // Default fallback - use the Service Desk\n    var deskGR = new GlideRecord('sys_user_group');\n    deskGR.addQuery('name', 'Service Desk');\n    deskGR.query();\n    \n    if (deskGR.next()) {\n        outputs.group_id = deskGR.sys_id.toString();\n        outputs.group_name = deskGR.name.toString();\n        outputs.result = 'No location match found, using default Service Desk';\n    } else {\n        outputs.result = 'Could not find any appropriate assignment group';\n    }\n    \n})(inputs, outputs);"
+        },
+        {
+            "name": "Update Incident Assignment",
+            "type": "update_record",
+            "table": "incident",
+            "record_id": "${trigger.sys_id}",
+            "values": {
+                "assignment_group": "${Find Assignment Group by Location.group_id}",
+                "work_notes": "Automatically assigned to ${Find Assignment Group by Location.group_name} based on caller's location"
+            },
+            "conditions": {
+                "when": "${Find Assignment Group by Location.group_id != ''}"
+            }
+        },
+        {
+            "name": "Log Flow Completion",
+            "type": "log_message",
+            "message": "Incident ${trigger.number} processed for location assignment: ${Find Assignment Group by Location.result}"
+        }
+    ]
+}
